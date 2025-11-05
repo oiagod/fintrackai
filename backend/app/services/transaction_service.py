@@ -1,23 +1,23 @@
-from typing import List, Optional
-from app.models.transaction import Transaction
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
+from app.db.models.transaction import TransactionORM
 from datetime import date
 
 class TransactionService:
-    def __init__(self):
-        self._transactions: List[Transaction] = []
-        self._next_id = 1
+    def __init__(self, db: AsyncSession):
+        self.db= db
 
-    def create(self, amount: float, date_: date, description: Optional[str] = None) -> Transaction:
-        txn = Transaction(id=self._next_id, amount=amount, date=date_, description=description)
-        self._transactions.append(txn)
-        self._next_id += 1
+    async def create(self, amount: float, date_: date, description: str | None = None, category: str | None = None):
+        txn = TransactionORM(amount=amount, date=date_, description=description, category=category)
+        self.db.add(txn)
+        await self.db.commit()
+        await self.db.refresh(txn)
         return txn
     
-    def list_all(self) -> List[Transaction]:
-        return self._transactions
+    async def list_all(self):
+        result = await self.db.execute(select(TransactionORM))
+        return result.scalars().all()
 
-    def get_by_id(self, transaction_id: int) -> Optional[Transaction]:
-        for t in self._transactions:
-            if t.id == transaction_id:
-                return t
-        return None
+    async def get_by_id(self, txn_id: int):
+        result = await self.db.execute(select(TransactionORM).where(TransactionORM.id == txn_id))
+        return result.scalar_one_or_none()
