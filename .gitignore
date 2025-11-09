@@ -3,6 +3,8 @@
 __pycache__/
 *.pyc
 
+#SQLite local
+fintrack.db
 # IDEs
 .vscode/
 .idea/
