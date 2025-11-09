@@ -4,12 +4,19 @@ from typing import Optional
 from app.db.session import get_db
 from app.services.transaction_service import TransactionService
 from sqlalchemy.ext.asyncio import AsyncSession
+from app.core.dependencies import get_current_user
 
 router = APIRouter(prefix="/transactions", tags=["transactions"])
 
 
 @router.post("/")
-async def create_transaction(amount: float, date_:date, description: Optional[str] = None, category: Optional[str] = None, db: AsyncSession = Depends(get_db)):
+async def create_transaction(
+    amount: float,
+    date_:date,
+    description: Optional[str] = None,
+    category: Optional[str] = None,
+    db: AsyncSession = Depends(get_db),
+    current_user = Depends(get_current_user)):
     service = TransactionService(db)
     return await service.create(amount, date_, description, category)
 
