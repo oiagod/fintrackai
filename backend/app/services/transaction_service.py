@@ -15,6 +15,7 @@ class TransactionService:
                      predicted_category: Optional[str] = None,
                      confidence: Optional[float] = None):
         txn = TransactionORM(
+            user_id=self.user_id,
             amount=amount,
             date=date_,
             description=description,
