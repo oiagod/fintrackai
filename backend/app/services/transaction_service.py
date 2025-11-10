@@ -2,13 +2,26 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from app.db.models.transaction import TransactionORM
 from datetime import date
+from typing import Optional
 
 class TransactionService:
-    def __init__(self, db: AsyncSession):
+    def __init__(self, db: AsyncSession, user_id: int):
         self.db= db
+        self.user_id = user_id
 
-    async def create(self, amount: float, date_: date, description: str | None = None, category: str | None = None):
-        txn = TransactionORM(amount=amount, date=date_, description=description, category=category)
+    async def create(self, amount: float, date_: date,
+                     description: str | None = None,
+                     category: str | None = None,
+                     predicted_category: Optional[str] = None,
+                     confidence: Optional[float] = None):
+        txn = TransactionORM(
+            amount=amount,
+            date=date_,
+            description=description,
+            category=category,
+            predicted_category=predicted_category,
+            confidence=confidence,
+        )
         self.db.add(txn)
         await self.db.commit()
         await self.db.refresh(txn)
