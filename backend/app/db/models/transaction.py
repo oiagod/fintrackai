@@ -4,8 +4,8 @@ from app.db.session import Base
 class TransactionORM(Base):
     __tablename__ = "transactions"
 
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, autoincrement=True ,index=True)
+    user_id = Column(Integer, nullable=False, index=True)
     amount = Column(Numeric(10, 2), nullable=False)
     date = Column(Date, nullable=False)
     description = Column(String, nullable=True)
